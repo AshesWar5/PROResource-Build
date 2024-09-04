@@ -4,15 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Unity WebGL Game</title>
+    <!-- Подключаем Telegram Web Apps API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="%UNITY_WEBGL_LOADER_URL%" defer></script>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #unityContainer { width: 100%; height: 100%; position: absolute; top: 0; left: 0; background: black; }
+    </style>
 </head>
 <body>
-    <div id="unityContainer" style="width: 100%; height: 100%;"></div>
+    <div id="unityContainer"></div>
     <script>
-        var unityInstance = UnityLoader.instantiate("unityContainer", "%UNITY_WEBGL_BUILD_URL%", {onProgress: UnityProgress});
+        // Конфигурация для Unity
+        var buildUrl = "%UNITY_WEBGL_BUILD_URL%";
+        var loaderUrl = buildUrl + "/%UNITY_WEBGL_LOADER_FILENAME%";
+        var config = {
+            dataUrl: buildUrl + "/%UNITY_WEBGL_DATA_FILENAME%",
+            frameworkUrl: buildUrl + "/%UNITY_WEBGL_FRAMEWORK_FILENAME%",
+            codeUrl: buildUrl + "/%UNITY_WEBGL_CODE_FILENAME%",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "%COMPANY_NAME%",
+            productName: "%PRODUCT_NAME%",
+            productVersion: "%PRODUCT_VERSION%",
+        };
 
+        // Загрузка Unity
+        var script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = () => {
+            createUnityInstance(document.querySelector("#unityContainer"), config, (progress) => {
+                console.log("Loading progress: " + progress * 100 + "%");
+            }).then((unityInstance) => {
+                console.log("Unity loaded successfully.");
+            }).catch((message) => {
+                alert(message);
+            });
+        };
+        document.body.appendChild(script);
+
+        // Telegram Web Apps API: Инициализация
         Telegram.WebApp.ready();
+
+        // Пример вызова showAlert
+        // function showAlertFromTelegram() {
+        //     Telegram.WebApp.showAlert("Hello from Unity WebGL!");
+        // }
     </script>
 </body>
 </html>
